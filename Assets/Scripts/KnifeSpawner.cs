@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class KnifeSpawner : MonoBehaviour
 {
+    [Header("Knife Setup")]
     public GameObject knifePrefab; // assign Knife prefab
     public Transform spawnPoint;   // assign SpawnPoint
 
@@ -10,13 +11,13 @@ public class KnifeSpawner : MonoBehaviour
 
     void Start()
     {
-        // Spawn the first knife, but don’t throw
+        // Spawn the first knife (but don't throw automatically)
         SpawnKnife();
     }
 
     void Update()
     {
-        // Throw knife only when player clicks
+        // Only throw when player clicks and knife is ready
         if (Input.GetMouseButtonDown(0) && knifeReady)
         {
             ThrowKnife();
@@ -32,7 +33,7 @@ public class KnifeSpawner : MonoBehaviour
         }
 
         currentKnife = Instantiate(knifePrefab, spawnPoint.position, spawnPoint.rotation);
-        currentKnife.transform.localScale = knifePrefab.transform.localScale; // keep correct size
+        currentKnife.transform.localScale = knifePrefab.transform.localScale;
         knifeReady = true;
     }
 
@@ -41,12 +42,15 @@ public class KnifeSpawner : MonoBehaviour
         if (currentKnife == null) return;
 
         Rigidbody2D rb = currentKnife.GetComponent<Rigidbody2D>();
-        rb.linearVelocity = Vector2.up * 25f; // knife speed
-        knifeReady = false;
+        rb.linearVelocity = Vector2.up * 25f; // controls how fast the knife flies
 
+        knifeReady = false;
         currentKnife = null;
 
-        // Spawn next knife after delay
+        // spawn the next knife after 0.7 seconds
         Invoke(nameof(SpawnKnife), 0.7f);
+
+
+
     }
 }
