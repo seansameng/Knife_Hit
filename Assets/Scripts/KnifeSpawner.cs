@@ -1,24 +1,32 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class KnifeSpawner : MonoBehaviour
 {
     [Header("Knife Setup")]
-    public GameObject knifePrefab; // assign Knife prefab
-    public Transform spawnPoint;   // assign SpawnPoint
+    public GameObject knifePrefab;
+    public Transform spawnPoint;
+    public float throwForce = 25f;
+    public float spawnDelay = 0.7f;
+    public int totalKnives = 10; // total knives player starts with
+
+    [Header("UI")]
+    public Text scoreText;
+    public Text knivesLeftText;
 
     private GameObject currentKnife;
     private bool knifeReady = false;
+    private int score = 0;
 
     void Start()
     {
-        // Spawn the first knife (but don't throw automatically)
+        UpdateUI();
         SpawnKnife();
     }
 
     void Update()
     {
-        // Only throw when player clicks and knife is ready
-        if (Input.GetMouseButtonDown(0) && knifeReady)
+        if (Input.GetMouseButtonDown(0) && knifeReady && totalKnives > 0)
         {
             ThrowKnife();
         }
@@ -26,14 +34,15 @@ public class KnifeSpawner : MonoBehaviour
 
     void SpawnKnife()
     {
-        if (knifePrefab == null || spawnPoint == null)
-        {
-            Debug.LogError("KnifePrefab or SpawnPoint missing!");
-            return;
-        }
+        if (knifePrefab == null || spawnPoint == null || totalKnives <= 0) return;
 
         currentKnife = Instantiate(knifePrefab, spawnPoint.position, spawnPoint.rotation);
         currentKnife.transform.localScale = knifePrefab.transform.localScale;
+
+        // Make sure Knife.cs is attached
+        if (currentKnife.GetComponent<Knife>() == null)
+            currentKnife.AddComponent<Knife>();
+
         knifeReady = true;
     }
 
@@ -42,15 +51,33 @@ public class KnifeSpawner : MonoBehaviour
         if (currentKnife == null) return;
 
         Rigidbody2D rb = currentKnife.GetComponent<Rigidbody2D>();
-        rb.linearVelocity = Vector2.up * 25f; // controls how fast the knife flies
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        rb.linearVelocity = Vector2.up * throwForce;
 
         knifeReady = false;
         currentKnife = null;
 
-        // spawn the next knife after 0.7 seconds
-        Invoke(nameof(SpawnKnife), 0.7f);
+        totalKnives--; // decrease knife count
+        UpdateUI();
 
+        if (totalKnives > 0)
+            Invoke(nameof(SpawnKnife), spawnDelay);
+        else
+            Debug.Log("Game Over!"); // optional: add Game Over UI later
+    }
 
+    public void AddScore(int points)
+    {
+        score += points;
+        UpdateUI();
+    }
 
+    void UpdateUI()
+    {
+        if (scoreText != null)
+            scoreText.text = "" + score;
+
+        if (knivesLeftText != null)
+            knivesLeftText.text = "Knives Left: " + totalKnives;
     }
 }
