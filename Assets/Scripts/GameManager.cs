@@ -7,5 +7,8 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Game Over!");
         SceneManager.LoadScene("MainMenu");
+
+
+
     }
 }
