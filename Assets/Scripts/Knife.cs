@@ -28,6 +28,8 @@ public class Knife : MonoBehaviour
             KnifeSpawner spawner = FindObjectOfType<KnifeSpawner>();
             if (spawner != null)
                 spawner.AddScore(1);
+
+
         }
     }
 }
