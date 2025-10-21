@@ -3,7 +3,7 @@ using UnityEngine;
 public class Knife : MonoBehaviour
 {
     public float speed = 15f;
-    private bool isHit = false; // prevents multiple hits
+    private bool isHit = false;
 
     void Update()
     {
@@ -13,23 +13,32 @@ public class Knife : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!isHit && collision.CompareTag("Trunk"))
-        {
-            isHit = true; // mark it as hit
-            transform.SetParent(collision.transform);
+        if (isHit) return; // prevent multiple hits
 
+        if (collision.CompareTag("Trunk"))
+        {
+            isHit = true;
+
+            transform.SetParent(collision.transform);
             Rigidbody2D rb = GetComponent<Rigidbody2D>();
             if (rb != null)
                 rb.bodyType = RigidbodyType2D.Kinematic;
-
             speed = 0f;
 
-            // Add score
-            KnifeSpawner spawner = FindObjectOfType<KnifeSpawner>();
-            if (spawner != null)
-                spawner.AddScore(1);
-
-
+            // Add score + decrease knives left
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.AddScore(1);
+                GameManager.Instance.UseKnife();
+            }
+        }
+        else if (collision.CompareTag("Knife"))
+        {
+            // Knife hit another knife → lose
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.KnifeHitKnife();
+            }
         }
     }
 }

@@ -1,23 +1,23 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro; // <-- for TextMeshProUGUI
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
     [Header("UI Elements")]
-    public Text scoreText;
-    public Text knivesLeftText;
-    public Text levelText;
+    public TextMeshProUGUI scoreText;
+    public TextMeshProUGUI knivesLeftText;
+    public TextMeshProUGUI levelText;
 
     [Header("Game Over UI")]
-    public GameObject gameOverPanel;     // panel with GameOverText, FinalScoreText, buttons
-    public Text gameOverText;            // "You Win!" / "You Lose!"
-    public Text finalScoreText;          // final score shown on GameOverPanel
+    public GameObject gameOverPanel;
+    public TextMeshProUGUI gameOverText;   // "You Win!" / "You Lose!"
+    public TextMeshProUGUI finalScoreText; // final score
 
     [Header("Game Panel")]
-    public GameObject gamePanel;         // active gameplay panel
+    public GameObject gamePanel;
 
     [Header("Level Settings")]
     public int level = 1;
@@ -42,6 +42,8 @@ public class GameManager : MonoBehaviour
     {
         StartLevel(level);
     }
+
+
 
     // --- Knife & Score Methods ---
     public void AddScore(int points)
@@ -80,7 +82,6 @@ public class GameManager : MonoBehaviour
 
         ResetTrunk();
 
-        // auto go to next level after 2 seconds
         Invoke(nameof(NextLevel), 2f);
     }
 
@@ -104,7 +105,7 @@ public class GameManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu"); // replace with your MainMenu scene name
+        SceneManager.LoadScene("MainMenu"); // change to your main menu scene name
     }
 
     void NextLevel()
@@ -149,8 +150,9 @@ public class GameManager : MonoBehaviour
     {
         TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
         if (trunk != null)
-            trunk.ResetTrunk();
+            trunk.ResetTrunk(); // now this works
     }
+
 
     void UpdateUI()
     {
