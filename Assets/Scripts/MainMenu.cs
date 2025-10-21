@@ -5,12 +5,13 @@ public class MainMenu : MonoBehaviour
 {
     public void PlayGame()
     {
-        SceneManager.LoadScene("Level1");
+        // Hide main menu and start GamePanel
+        // Assuming you have GamePanel in your scene
+        SceneManager.LoadScene("GameScene"); // Your game scene name
     }
 
     public void QuitGame()
     {
-        Debug.Log("Quit!");
         Application.Quit();
     }
 }
