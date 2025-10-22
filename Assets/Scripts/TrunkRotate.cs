@@ -7,7 +7,7 @@ public class TrunkRotate : MonoBehaviour
     private bool isRotating = true;
 
     [Header("Trunk Pieces for Breaking")]
-    public Rigidbody2D[] trunkPieces; // assign child pieces in inspector
+    public Rigidbody2D[] trunkPieces; // assign in Inspector
 
     void Update()
     {
@@ -24,10 +24,11 @@ public class TrunkRotate : MonoBehaviour
 
         foreach (Rigidbody2D piece in trunkPieces)
         {
+            piece.isKinematic = true; // stop physics
             piece.linearVelocity = Vector2.zero;
             piece.angularVelocity = 0f;
-            piece.isKinematic = true;
             piece.transform.localPosition = Vector3.zero; // reset relative position
+            piece.transform.localRotation = Quaternion.identity;
         }
     }
 
@@ -37,9 +38,9 @@ public class TrunkRotate : MonoBehaviour
 
         foreach (Rigidbody2D piece in trunkPieces)
         {
-            piece.isKinematic = false;
-            piece.AddTorque(Random.Range(-200f, 200f));
-            piece.AddForce(new Vector2(Random.Range(-50f, 50f), Random.Range(50f, 100f)));
+            piece.isKinematic = false; // physics take over
+            piece.AddTorque(Random.Range(-200f, 200f)); // random spin
+            piece.AddForce(new Vector2(Random.Range(-50f, 50f), Random.Range(50f, 150f))); // random burst
         }
     }
 }
