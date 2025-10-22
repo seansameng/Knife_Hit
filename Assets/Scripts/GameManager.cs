@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -26,28 +27,35 @@ public class GameManager : MonoBehaviour
     private int knivesLeft;
     private bool gameEnded = false;
 
+    [Header("Trunk Settings")]
+    public GameObject trunkPrefab; // Assign trunk prefab here
+    public Transform trunkSpawnPoint;
+    private TrunkRotate currentTrunk;
+
     void Awake()
     {
         if (Instance == null)
-        {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
         else
-        {
             Destroy(gameObject);
-        }
+
+        ShowStartPanel();
     }
 
-    void Start()
+    void ShowStartPanel()
     {
-        // Show start panel first
         startPanel.SetActive(true);
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
+
+        score = 0;
+        level = 1;
+        gameEnded = false;
+        UpdateUI();
+
+        ResetCurrentTrunk();
     }
 
-    // --- Called by Play Button ---
     public void StartGame()
     {
         startPanel.SetActive(false);
@@ -58,10 +66,10 @@ public class GameManager : MonoBehaviour
         level = 1;
         gameEnded = false;
 
+        SpawnTrunk();
         StartLevel(level);
     }
 
-    // --- Knife & Score Methods ---
     public void AddScore(int points)
     {
         if (gameEnded) return;
@@ -78,54 +86,75 @@ public class GameManager : MonoBehaviour
 
         if (knivesLeft <= 0)
         {
-            WinLevel();
+            StartCoroutine(WinLevelFlow());
         }
     }
 
     public void KnifeHitKnife()
     {
-        LoseGame();
+        if (!gameEnded)
+            LoseGame();
     }
 
-    // --- Win/Lose Methods ---
-    void WinLevel()
+    IEnumerator WinLevelFlow()
     {
         gameEnded = true;
 
-        if (gameOverText != null) gameOverText.text = "You Win!";
-        if (finalScoreText != null) finalScoreText.text = "Score: " + score;
-
+        UpdateGameOverUI("You Win!");
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(true);
 
-        // BREAK TRUNK
-        TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
-        if (trunk != null)
-            trunk.BreakTrunk();
+        if (currentTrunk != null)
+            currentTrunk.BreakTrunk();
 
-        Invoke(nameof(NextLevel), 2f);
+        // Wait 2 seconds to show the broken trunk
+        yield return new WaitForSeconds(2f);
+
+        // Destroy broken trunk
+        if (currentTrunk != null)
+            Destroy(currentTrunk.gameObject);
+
+        // Increase level
+        level++;
+
+        if (level > 5)
+        {
+            UpdateGameOverUI("🏆 You Finished All Levels!");
+            yield break;
+        }
+
+        // Spawn new trunk for next level
+        SpawnTrunk();
+
+        // Reset knives for next level
+        StartLevel(level);
+
+        gameEnded = false;
     }
 
     void LoseGame()
     {
         gameEnded = true;
-
-        if (gameOverText != null) gameOverText.text = "You Lose!";
-        if (finalScoreText != null) finalScoreText.text = "Score: " + score;
-
+        UpdateGameOverUI("You Lose!");
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(true);
 
-        TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
-        if (trunk != null)
-            trunk.ResetTrunk();
+        ResetCurrentTrunk();
     }
 
-    // --- Buttons Methods ---
     public void RestartLevel()
     {
         StartLevel(level);
         gameEnded = false;
+        gameOverPanel.SetActive(false);
+        gamePanel.SetActive(true);
+
+        ResetCurrentTrunk();
+    }
+
+    public void QuitToStartPanel()
+    {
+        ShowStartPanel();
     }
 
     public void GoToMainMenu()
@@ -133,20 +162,6 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
-    void NextLevel()
-    {
-        level++;
-        if (level > 5)
-        {
-            if (gameOverText != null) gameOverText.text = "🏆 You Finished All Levels!";
-            return;
-        }
-
-        StartLevel(level);
-        gameEnded = false;
-    }
-
-    // --- Level Setup ---
     void StartLevel(int currentLevel)
     {
         gamePanel.SetActive(true);
@@ -168,22 +183,35 @@ public class GameManager : MonoBehaviour
 
     void SetTrunkSpeed(float speed)
     {
-        TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
-        if (trunk != null)
-            trunk.rotateSpeed = speed;
-    }
-
-    void ResetTrunk()
-    {
-        TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
-        if (trunk != null)
-            trunk.ResetTrunk();
+        if (currentTrunk != null)
+            currentTrunk.rotateSpeed = speed;
     }
 
     void UpdateUI()
     {
-        if (scoreText != null) scoreText.text = "Score: " + score;
-        if (knivesLeftText != null) knivesLeftText.text = "Knives Left: " + knivesLeft;
-        if (levelText != null) levelText.text = "Level: " + level;
+        if (scoreText != null) scoreText.text = $"Score: {score}";
+        if (knivesLeftText != null) knivesLeftText.text = $"Knives Left: {knivesLeft}";
+        if (levelText != null) levelText.text = $"Level: {level}";
+    }
+
+    void UpdateGameOverUI(string message)
+    {
+        if (gameOverText != null) gameOverText.text = message;
+        if (finalScoreText != null) finalScoreText.text = $"Score: {score}";
+    }
+
+    void ResetCurrentTrunk()
+    {
+        if (currentTrunk != null)
+            currentTrunk.ResetTrunk();
+    }
+
+    void SpawnTrunk()
+    {
+        if (trunkPrefab != null && trunkSpawnPoint != null)
+        {
+            GameObject trunkObj = Instantiate(trunkPrefab, trunkSpawnPoint.position, Quaternion.identity);
+            currentTrunk = trunkObj.GetComponent<TrunkRotate>();
+        }
     }
 }
