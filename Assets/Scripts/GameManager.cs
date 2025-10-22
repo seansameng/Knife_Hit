@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using TMPro; // <-- for TextMeshProUGUI
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+
+    [Header("Panels")]
+    public GameObject startPanel;
+    public GameObject gamePanel;
+    public GameObject gameOverPanel;
 
     [Header("UI Elements")]
     public TextMeshProUGUI scoreText;
@@ -12,12 +17,8 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI levelText;
 
     [Header("Game Over UI")]
-    public GameObject gameOverPanel;
-    public TextMeshProUGUI gameOverText;   // "You Win!" / "You Lose!"
-    public TextMeshProUGUI finalScoreText; // final score
-
-    [Header("Game Panel")]
-    public GameObject gamePanel;
+    public TextMeshProUGUI gameOverText;
+    public TextMeshProUGUI finalScoreText;
 
     [Header("Level Settings")]
     public int level = 1;
@@ -40,10 +41,25 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        StartLevel(level);
+        // Show start panel first
+        startPanel.SetActive(true);
+        gamePanel.SetActive(false);
+        gameOverPanel.SetActive(false);
     }
 
+    // --- Called by Play Button ---
+    public void StartGame()
+    {
+        startPanel.SetActive(false);
+        gamePanel.SetActive(true);
+        gameOverPanel.SetActive(false);
 
+        score = 0;
+        level = 1;
+        gameEnded = false;
+
+        StartLevel(level);
+    }
 
     // --- Knife & Score Methods ---
     public void AddScore(int points)
@@ -75,12 +91,17 @@ public class GameManager : MonoBehaviour
     void WinLevel()
     {
         gameEnded = true;
-        gameOverText.text = "You Win!";
-        finalScoreText.text = "Score: " + score;
+
+        if (gameOverText != null) gameOverText.text = "You Win!";
+        if (finalScoreText != null) finalScoreText.text = "Score: " + score;
+
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(true);
 
-        ResetTrunk();
+        // BREAK TRUNK
+        TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
+        if (trunk != null)
+            trunk.BreakTrunk();
 
         Invoke(nameof(NextLevel), 2f);
     }
@@ -88,12 +109,16 @@ public class GameManager : MonoBehaviour
     void LoseGame()
     {
         gameEnded = true;
-        gameOverText.text = "You Lose!";
-        finalScoreText.text = "Score: " + score;
+
+        if (gameOverText != null) gameOverText.text = "You Lose!";
+        if (finalScoreText != null) finalScoreText.text = "Score: " + score;
+
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(true);
 
-        ResetTrunk();
+        TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
+        if (trunk != null)
+            trunk.ResetTrunk();
     }
 
     // --- Buttons Methods ---
@@ -105,7 +130,7 @@ public class GameManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu"); // change to your main menu scene name
+        SceneManager.LoadScene("MainMenu");
     }
 
     void NextLevel()
@@ -113,7 +138,7 @@ public class GameManager : MonoBehaviour
         level++;
         if (level > 5)
         {
-            gameOverText.text = "🏆 You Finished All Levels!";
+            if (gameOverText != null) gameOverText.text = "🏆 You Finished All Levels!";
             return;
         }
 
@@ -126,6 +151,7 @@ public class GameManager : MonoBehaviour
     {
         gamePanel.SetActive(true);
         gameOverPanel.SetActive(false);
+        gameEnded = false;
 
         switch (currentLevel)
         {
@@ -134,6 +160,7 @@ public class GameManager : MonoBehaviour
             case 3: knivesLeft = 7; SetTrunkSpeed(200f); break;
             case 4: knivesLeft = 8; SetTrunkSpeed(250f); break;
             case 5: knivesLeft = 9; SetTrunkSpeed(300f); break;
+            default: knivesLeft = 5; break;
         }
 
         UpdateUI();
@@ -150,17 +177,13 @@ public class GameManager : MonoBehaviour
     {
         TrunkRotate trunk = FindObjectOfType<TrunkRotate>();
         if (trunk != null)
-            trunk.ResetTrunk(); // now this works
+            trunk.ResetTrunk();
     }
-
 
     void UpdateUI()
     {
-        if (scoreText != null)
-            scoreText.text = "Score: " + score;
-        if (knivesLeftText != null)
-            knivesLeftText.text = "Knives Left: " + knivesLeft;
-        if (levelText != null)
-            levelText.text = "Level: " + level;
+        if (scoreText != null) scoreText.text = "Score: " + score;
+        if (knivesLeftText != null) knivesLeftText.text = "Knives Left: " + knivesLeft;
+        if (levelText != null) levelText.text = "Level: " + level;
     }
 }
