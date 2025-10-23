@@ -4,11 +4,19 @@ public class Knife : MonoBehaviour
 {
     public float speed = 15f;
     private bool isHit = false;
+    private bool readyToThrow = false;
 
     void Update()
     {
-        if (!isHit)
+        if (!readyToThrow && Input.GetMouseButtonDown(0))
+        {
+            readyToThrow = true;
+        }
+
+        if (readyToThrow && !isHit)
+        {
             transform.Translate(Vector2.up * speed * Time.deltaTime);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -18,6 +26,7 @@ public class Knife : MonoBehaviour
         if (collision.CompareTag("Trunk"))
         {
             isHit = true;
+            readyToThrow = false;
 
             transform.SetParent(collision.transform);
             Rigidbody2D rb = GetComponent<Rigidbody2D>();
@@ -25,30 +34,23 @@ public class Knife : MonoBehaviour
 
             speed = 0f;
 
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.AddScore(1);
-                GameManager.Instance.UseKnife();
-            }
+            GameManager.Instance?.AddScore(1);
+            GameManager.Instance?.UseKnife();
 
             TrunkRotate trunk = collision.GetComponent<TrunkRotate>();
-            if (trunk != null)
-            {
-                trunk.OnKnifeHit();
-            }
+            trunk?.OnKnifeHit();
         }
         else if (collision.CompareTag("Knife"))
         {
-            if (GameManager.Instance != null)
-                GameManager.Instance.KnifeHitKnife();
+            GameManager.Instance?.KnifeHitKnife();
         }
     }
 
-    public void ResetKnife(Vector3 spawnPosition)
+    public void ResetKnife()
     {
         isHit = false;
+        readyToThrow = false;
         transform.SetParent(null);
-        transform.position = spawnPosition;
 
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
@@ -57,6 +59,7 @@ public class Knife : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
         }
+
         speed = 15f;
         gameObject.SetActive(true);
     }
