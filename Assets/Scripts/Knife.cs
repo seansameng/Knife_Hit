@@ -8,14 +8,14 @@ public class Knife : MonoBehaviour
 
     void Update()
     {
+        // Only move if thrown
+        if (readyToThrow && !isHit)
+            transform.Translate(Vector2.up * speed * Time.deltaTime);
+
+        // Click to throw knife
         if (!readyToThrow && Input.GetMouseButtonDown(0))
         {
             readyToThrow = true;
-        }
-
-        if (readyToThrow && !isHit)
-        {
-            transform.Translate(Vector2.up * speed * Time.deltaTime);
         }
     }
 
@@ -34,11 +34,12 @@ public class Knife : MonoBehaviour
 
             speed = 0f;
 
+            // Add score & decrease knives
             GameManager.Instance?.AddScore(1);
             GameManager.Instance?.UseKnife();
 
-            TrunkRotate trunk = collision.GetComponent<TrunkRotate>();
-            trunk?.OnKnifeHit();
+            // Notify trunk of hit
+            collision.GetComponent<TrunkRotate>()?.OnKnifeHit();
         }
         else if (collision.CompareTag("Knife"))
         {
@@ -51,7 +52,6 @@ public class Knife : MonoBehaviour
         isHit = false;
         readyToThrow = false;
         transform.SetParent(null);
-
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
@@ -59,7 +59,6 @@ public class Knife : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
             rb.angularVelocity = 0f;
         }
-
         speed = 15f;
         gameObject.SetActive(true);
     }

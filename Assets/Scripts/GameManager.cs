@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 
@@ -20,9 +19,9 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI finalScoreText;
 
     [Header("Prefabs & Spawn Points")]
-    public GameObject trunkPrefab;  // Drag your Trunk prefab here
+    public GameObject trunkPrefab;
     public Transform trunkSpawnPoint;
-    public GameObject knifePrefab;  // Drag your Knife prefab here
+    public GameObject knifePrefab;
     public Transform knifeSpawnPoint;
 
     private TrunkRotate currentTrunk;
@@ -43,7 +42,6 @@ public class GameManager : MonoBehaviour
         ShowStartPanel();
     }
 
-    // ------------------ PANEL LOGIC ------------------
     void ShowStartPanel()
     {
         startPanel.SetActive(true);
@@ -68,19 +66,17 @@ public class GameManager : MonoBehaviour
 
         gameEnded = false;
         score = 0;
-        knivesLeft = 5;
         level = 1;
+        knivesLeft = 5;
         UpdateUI();
 
         SpawnTrunk();
         SpawnKnife();
     }
 
-    // ------------------ SPAWN LOGIC ------------------
     void SpawnTrunk()
     {
         DestroyCurrentTrunk();
-
         if (trunkPrefab != null && trunkSpawnPoint != null)
         {
             GameObject trunkObj = Instantiate(trunkPrefab, trunkSpawnPoint.position, Quaternion.identity);
@@ -91,30 +87,24 @@ public class GameManager : MonoBehaviour
     void SpawnKnife()
     {
         DestroyCurrentKnife();
-
         if (knifePrefab != null && knifeSpawnPoint != null)
         {
             GameObject knifeObj = Instantiate(knifePrefab, knifeSpawnPoint.position, Quaternion.identity);
             currentKnife = knifeObj.GetComponent<Knife>();
-
-            // Important: Make sure knife only flies on click
-            if (currentKnife != null) currentKnife.ResetKnife();
+            currentKnife?.ResetKnife();
         }
     }
 
     void DestroyCurrentTrunk()
     {
-        if (currentTrunk != null)
-            Destroy(currentTrunk.gameObject);
+        if (currentTrunk != null) Destroy(currentTrunk.gameObject);
     }
 
     void DestroyCurrentKnife()
     {
-        if (currentKnife != null)
-            Destroy(currentKnife.gameObject);
+        if (currentKnife != null) Destroy(currentKnife.gameObject);
     }
 
-    // ------------------ GAMEPLAY LOGIC ------------------
     public void AddScore(int points)
     {
         if (gameEnded) return;
@@ -129,14 +119,8 @@ public class GameManager : MonoBehaviour
         knivesLeft--;
         UpdateUI();
 
-        if (knivesLeft <= 0)
-        {
-            StartCoroutine(WinLevelFlow());
-        }
-        else
-        {
-            SpawnKnife(); // spawn next knife only when previous is used
-        }
+        if (knivesLeft <= 0) StartCoroutine(WinLevelFlow());
+        else SpawnKnife();
     }
 
     public void KnifeHitKnife()
@@ -152,8 +136,7 @@ public class GameManager : MonoBehaviour
         gameOverPanel.SetActive(true);
 
         currentTrunk?.BreakTrunk();
-
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.5f);
 
         DestroyCurrentTrunk();
         DestroyCurrentKnife();
@@ -207,17 +190,16 @@ public class GameManager : MonoBehaviour
         Application.Quit();
     }
 
-    // ------------------ UI LOGIC ------------------
     void UpdateUI()
     {
-        if (scoreText != null) scoreText.text = $"Score: {score}";
-        if (knivesLeftText != null) knivesLeftText.text = $"Knives Left: {knivesLeft}";
-        if (levelText != null) levelText.text = $"Level: {level}";
+        scoreText.text = $"Score: {score}";
+        knivesLeftText.text = $"Knives Left: {knivesLeft}";
+        levelText.text = $"Level: {level}";
     }
 
     void UpdateGameOverUI(string message)
     {
-        if (gameOverText != null) gameOverText.text = message;
-        if (finalScoreText != null) finalScoreText.text = $"Score: {score}";
+        gameOverText.text = message;
+        finalScoreText.text = $"Score: {score}";
     }
 }
