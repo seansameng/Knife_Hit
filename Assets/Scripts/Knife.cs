@@ -3,63 +3,54 @@ using UnityEngine;
 public class Knife : MonoBehaviour
 {
     public float speed = 15f;
-    private bool isHit = false;
-    private bool readyToThrow = false;
+    private bool thrown = false;
+    private bool stuck = false;
 
     void Update()
     {
-        // Only move if thrown
-        if (readyToThrow && !isHit)
+        if (thrown && !stuck)
             transform.Translate(Vector2.up * speed * Time.deltaTime);
 
-        // Click to throw knife
-        if (!readyToThrow && Input.GetMouseButtonDown(0))
-        {
-            readyToThrow = true;
-        }
+        if (!thrown && Input.GetMouseButtonDown(0))
+            thrown = true;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isHit) return;
+        if (stuck) return;
 
         if (collision.CompareTag("Trunk"))
         {
-            isHit = true;
-            readyToThrow = false;
+            stuck = true;
+            thrown = false;
+
+            Rigidbody2D rb = GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.bodyType = RigidbodyType2D.Kinematic;
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+            }
 
             transform.SetParent(collision.transform);
-            Rigidbody2D rb = GetComponent<Rigidbody2D>();
-            if (rb != null) rb.bodyType = RigidbodyType2D.Kinematic;
-
             speed = 0f;
 
-            // Add score & decrease knives
-            GameManager.Instance?.AddScore(1);
-            GameManager.Instance?.UseKnife();
-
-            // Notify trunk of hit
             collision.GetComponent<TrunkRotate>()?.OnKnifeHit();
+            GameManager.Instance?.UseKnife();
         }
         else if (collision.CompareTag("Knife"))
         {
+            stuck = true;
+            thrown = false;
+
+            Rigidbody2D rb = GetComponent<Rigidbody2D>();
+            if (rb != null)
+            {
+                rb.linearVelocity = Vector2.zero;
+                rb.angularVelocity = 0f;
+            }
+
             GameManager.Instance?.KnifeHitKnife();
         }
-    }
-
-    public void ResetKnife()
-    {
-        isHit = false;
-        readyToThrow = false;
-        transform.SetParent(null);
-        Rigidbody2D rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.bodyType = RigidbodyType2D.Dynamic;
-            rb.linearVelocity = Vector2.zero;
-            rb.angularVelocity = 0f;
-        }
-        speed = 15f;
-        gameObject.SetActive(true);
     }
 }

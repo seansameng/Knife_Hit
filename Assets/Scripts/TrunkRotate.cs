@@ -3,60 +3,50 @@ using UnityEngine;
 public class TrunkRotate : MonoBehaviour
 {
     public float rotateSpeed = 150f;
-    public Rigidbody2D[] trunkPieces; // assign child pieces in inspector
     public int hitTarget = 5;
-    public AudioClip breakSound;
+    public Rigidbody2D[] trunkPieces;
 
     private int currentHits = 0;
-    private AudioSource audioSource;
-
-    void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
+    private bool isBroken = false;
+    private bool stopped = false;
 
     void Update()
     {
-        transform.Rotate(Vector3.forward * rotateSpeed * Time.deltaTime);
+        if (!isBroken && !stopped)
+            transform.Rotate(Vector3.forward * rotateSpeed * Time.deltaTime);
     }
 
-    // Call this when a knife hits the trunk
     public void OnKnifeHit()
     {
+        if (isBroken || stopped) return;
+
         currentHits++;
+        GameManager.Instance?.AddScore(1);
+        GameManager.Instance?.PlayKnifeHitSound();
+
         if (currentHits >= hitTarget)
         {
-            BreakTrunk();
+            isBroken = true;
+            GameManager.Instance?.OnTrunkBroken();
         }
     }
 
     public void BreakTrunk()
     {
-        // Play break sound
-        if (audioSource != null && breakSound != null)
-            audioSource.PlayOneShot(breakSound);
+        GameManager.Instance?.PlayTrunkBreakSound();
 
-        // Unparent pieces and enable physics
         foreach (Rigidbody2D piece in trunkPieces)
         {
+            if (piece == null) continue;
             piece.transform.SetParent(null);
             piece.isKinematic = false;
         }
 
-        // Disable main trunk object
         gameObject.SetActive(false);
     }
 
-    public void ResetTrunk()
+    public void StopTrunk()
     {
-        currentHits = 0;
-        foreach (Rigidbody2D piece in trunkPieces)
-        {
-            piece.transform.SetParent(transform);
-            piece.isKinematic = true;
-            piece.transform.localPosition = Vector3.zero;
-            piece.transform.localRotation = Quaternion.identity;
-        }
-        gameObject.SetActive(true);
+        stopped = true;
     }
 }
