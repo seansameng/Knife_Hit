@@ -16,21 +16,22 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public TextMeshProUGUI knivesLeftText;
     public TextMeshProUGUI levelText;
-
-    [Header("Game Over UI")]
     public TextMeshProUGUI gameOverText;
     public TextMeshProUGUI finalScoreText;
+
+    [Header("Prefabs & Spawns")]
+    public GameObject trunkPrefab;       // optional, only used if no trunk exists
+    public Transform trunkSpawnPoint;
+    public GameObject knifePrefab;
+    public Transform knifeSpawnPoint;
+
+    private TrunkRotate currentTrunk;
+    private bool gameEnded = false;
 
     [Header("Level Settings")]
     public int level = 1;
     public int score = 0;
     private int knivesLeft;
-    private bool gameEnded = false;
-
-    [Header("Trunk Settings")]
-    public GameObject trunkPrefab; // Assign trunk prefab here
-    public Transform trunkSpawnPoint;
-    private TrunkRotate currentTrunk;
 
     void Awake()
     {
@@ -52,10 +53,9 @@ public class GameManager : MonoBehaviour
         level = 1;
         gameEnded = false;
         UpdateUI();
-
-        ResetCurrentTrunk();
     }
 
+    // --- Called by Play Button ---
     public void StartGame()
     {
         startPanel.SetActive(false);
@@ -66,10 +66,24 @@ public class GameManager : MonoBehaviour
         level = 1;
         gameEnded = false;
 
-        SpawnTrunk();
+        FindExistingTrunk(); // ✅ Find or create trunk
         StartLevel(level);
     }
 
+    void FindExistingTrunk()
+    {
+        // Look for trunk already placed in scene
+        currentTrunk = FindObjectOfType<TrunkRotate>();
+
+        // If no trunk in scene, spawn one
+        if (currentTrunk == null && trunkPrefab != null && trunkSpawnPoint != null)
+        {
+            GameObject trunkObj = Instantiate(trunkPrefab, trunkSpawnPoint.position, Quaternion.identity);
+            currentTrunk = trunkObj.GetComponent<TrunkRotate>();
+        }
+    }
+
+    // --- Knife Logic ---
     public void AddScore(int points)
     {
         if (gameEnded) return;
@@ -96,6 +110,7 @@ public class GameManager : MonoBehaviour
             LoseGame();
     }
 
+    // --- Win/Lose Logic ---
     IEnumerator WinLevelFlow()
     {
         gameEnded = true;
@@ -107,61 +122,33 @@ public class GameManager : MonoBehaviour
         if (currentTrunk != null)
             currentTrunk.BreakTrunk();
 
-        // Wait 2 seconds to show the broken trunk
         yield return new WaitForSeconds(2f);
 
-        // Destroy broken trunk
-        if (currentTrunk != null)
-            Destroy(currentTrunk.gameObject);
+        ResetKnives();
 
-        // Increase level
         level++;
-
         if (level > 5)
         {
             UpdateGameOverUI("🏆 You Finished All Levels!");
             yield break;
         }
 
-        // Spawn new trunk for next level
-        SpawnTrunk();
+        // reuse existing trunk or respawn if destroyed
+        if (currentTrunk == null)
+            FindExistingTrunk();
 
-        // Reset knives for next level
         StartLevel(level);
-
         gameEnded = false;
     }
-
     void LoseGame()
     {
         gameEnded = true;
         UpdateGameOverUI("You Lose!");
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(true);
-
-        ResetCurrentTrunk();
     }
 
-    public void RestartLevel()
-    {
-        StartLevel(level);
-        gameEnded = false;
-        gameOverPanel.SetActive(false);
-        gamePanel.SetActive(true);
-
-        ResetCurrentTrunk();
-    }
-
-    public void QuitToStartPanel()
-    {
-        ShowStartPanel();
-    }
-
-    public void GoToMainMenu()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
-
+    // --- Level Setup ---
     void StartLevel(int currentLevel)
     {
         gamePanel.SetActive(true);
@@ -179,6 +166,23 @@ public class GameManager : MonoBehaviour
         }
 
         UpdateUI();
+        SpawnKnife();
+    }
+
+    void SpawnKnife()
+    {
+        if (knifePrefab != null && knifeSpawnPoint != null)
+        {
+            Instantiate(knifePrefab, knifeSpawnPoint.position, Quaternion.identity);
+        }
+    }
+
+    void ResetKnives()
+    {
+        foreach (Knife k in FindObjectsOfType<Knife>())
+        {
+            Destroy(k.gameObject);
+        }
     }
 
     void SetTrunkSpeed(float speed)
@@ -200,18 +204,43 @@ public class GameManager : MonoBehaviour
         if (finalScoreText != null) finalScoreText.text = $"Score: {score}";
     }
 
-    void ResetCurrentTrunk()
+    // --- Buttons ---
+    public void RestartLevel()
     {
+        ResetKnives();
+
         if (currentTrunk != null)
-            currentTrunk.ResetTrunk();
+        {
+            Destroy(currentTrunk.gameObject);
+            currentTrunk = null;
+        }
+
+        FindExistingTrunk();
+        StartLevel(level);
+        gameEnded = false;
+        gameOverPanel.SetActive(false);
+        gamePanel.SetActive(true);
     }
 
-    void SpawnTrunk()
+    public void QuitToStartPanel()
     {
-        if (trunkPrefab != null && trunkSpawnPoint != null)
+        ShowStartPanel();
+        ResetKnives();
+
+        if (currentTrunk != null)
         {
-            GameObject trunkObj = Instantiate(trunkPrefab, trunkSpawnPoint.position, Quaternion.identity);
-            currentTrunk = trunkObj.GetComponent<TrunkRotate>();
+            Destroy(currentTrunk.gameObject);
+            currentTrunk = null;
         }
     }
+
+    public void QuitGame()
+    {
+        Debug.Log("Quit Game");
+        Application.Quit();
+    }
 }
+
+
+
+
