@@ -19,22 +19,18 @@ public class Knife : MonoBehaviour
         {
             isHit = true;
 
-            // Stick knife to trunk
             transform.SetParent(collision.transform);
             Rigidbody2D rb = GetComponent<Rigidbody2D>();
-            if (rb != null)
-                rb.bodyType = RigidbodyType2D.Kinematic;
+            if (rb != null) rb.bodyType = RigidbodyType2D.Kinematic;
 
             speed = 0f;
 
-            // Add score & decrease knives
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.AddScore(1);
                 GameManager.Instance.UseKnife();
             }
 
-            // Notify trunk of hit
             TrunkRotate trunk = collision.GetComponent<TrunkRotate>();
             if (trunk != null)
             {
@@ -43,19 +39,17 @@ public class Knife : MonoBehaviour
         }
         else if (collision.CompareTag("Knife"))
         {
-            // Knife hit another knife → lose
             if (GameManager.Instance != null)
-            {
                 GameManager.Instance.KnifeHitKnife();
-            }
         }
     }
 
-    // Call this to reset knife for next level
-    public void ResetKnife()
+    public void ResetKnife(Vector3 spawnPosition)
     {
         isHit = false;
         transform.SetParent(null);
+        transform.position = spawnPosition;
+
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
