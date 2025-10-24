@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class TrunkRotate : MonoBehaviour
 {
@@ -6,47 +7,58 @@ public class TrunkRotate : MonoBehaviour
     public int hitTarget = 5;
     public Rigidbody2D[] trunkPieces;
 
-    private int currentHits = 0;
+    private int hits = 0;
     private bool isBroken = false;
-    private bool stopped = false;
 
     void Update()
     {
-        if (!isBroken && !stopped)
+        if (!isBroken)
             transform.Rotate(Vector3.forward * rotateSpeed * Time.deltaTime);
+    }
+
+    public void Setup(int level)
+    {
+        hitTarget = 5 + (level - 1);
+        isBroken = false;
+        hits = 0;
+        transform.rotation = Quaternion.identity;
+        gameObject.SetActive(true);
     }
 
     public void OnKnifeHit()
     {
-        if (isBroken || stopped) return;
+        if (isBroken) return;
 
-        currentHits++;
-        GameManager.Instance?.AddScore(1);
-        GameManager.Instance?.PlayKnifeHitSound();
+        hits++;
+        GameManager.Instance.OnKnifeHitTrunk();
 
-        if (currentHits >= hitTarget)
+        if (hits >= hitTarget)
         {
             isBroken = true;
-            GameManager.Instance?.OnTrunkBroken();
+            StartCoroutine(BreakDelay());
         }
+    }
+
+    private IEnumerator BreakDelay()
+    {
+        yield return new WaitForSeconds(0.15f);
+
+        // Tell GameManager to handle the win — it will break the trunk safely
+        if (GameManager.Instance != null)
+            StartCoroutine(GameManager.Instance.WinSequence());
     }
 
     public void BreakTrunk()
     {
-        GameManager.Instance?.PlayTrunkBreakSound();
-
         foreach (Rigidbody2D piece in trunkPieces)
         {
             if (piece == null) continue;
             piece.transform.SetParent(null);
             piece.isKinematic = false;
+            piece.AddForce(Random.insideUnitCircle * 5f, ForceMode2D.Impulse);
+            piece.AddTorque(Random.Range(-200f, 200f));
         }
 
         gameObject.SetActive(false);
-    }
-
-    public void StopTrunk()
-    {
-        stopped = true;
     }
 }
