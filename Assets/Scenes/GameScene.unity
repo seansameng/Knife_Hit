@@ -819,6 +819,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -472193975947251771, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
+      propertyPath: trunkPieces.Array.size
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 104521419498061800, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -833,15 +837,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 104521419498061800, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.05
+      value: -0.04
       objectReference: {fileID: 0}
     - target: {fileID: 104521419498061800, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.87
+      value: 2.42
       objectReference: {fileID: 0}
     - target: {fileID: 104521419498061800, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 104521419498061800, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -875,6 +879,14 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 104521419498061804, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.23
+      objectReference: {fileID: 0}
+    - target: {fileID: 104521419498061804, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0
+      objectReference: {fileID: 0}
     - target: {fileID: 104521419498349512, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
       propertyPath: m_Name
       value: Trunk
@@ -899,6 +911,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 712661222}
   m_SourcePrefab: {fileID: 100100000, guid: 4e1bac61511eea14388d8f9fe196f1c3, type: 3}
+--- !u!1 &324451322 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6320782818369309517, guid: d0f71f2f2610af34caef07887b9e1946, type: 3}
+  m_PrefabInstance: {fileID: 327171620}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &327171620
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -907,6 +924,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6320782818369309504, guid: d0f71f2f2610af34caef07887b9e1946, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6320782818369309505, guid: d0f71f2f2610af34caef07887b9e1946, type: 3}
+      propertyPath: m_GravityScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6320782818369309507, guid: d0f71f2f2610af34caef07887b9e1946, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.13
@@ -954,6 +979,10 @@ PrefabInstance:
     - target: {fileID: 6320782818369309517, guid: d0f71f2f2610af34caef07887b9e1946, type: 3}
       propertyPath: m_TagString
       value: Knife
+      objectReference: {fileID: 0}
+    - target: {fileID: 9169161672056326226, guid: d0f71f2f2610af34caef07887b9e1946, type: 3}
+      propertyPath: speed
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1091,16 +1120,19 @@ MonoBehaviour:
   levelText: {fileID: 179233074}
   gameOverText: {fileID: 48914611}
   finalScoreText: {fileID: 1986292457}
-  currentTrunk: {fileID: 712661222}
-  currentKnife: {fileID: 1207075005}
   tapToStartText: {fileID: 99633844}
-  trunkBreakSound: {fileID: 8300000, guid: dfb00bb4e8471d94e9e79a88ee1d7251, type: 3}
+  knifePrefab: {fileID: 324451322}
+  knifeSpawnPoint: {fileID: 1859718591}
+  trunkPrefab: {fileID: 712661217}
+  trunkSpawnPoint: {fileID: 597999893}
   knifeHitSound: {fileID: 8300000, guid: 0765dc4619cb6bf46bf002a69b68e6b2, type: 3}
-  knifeHitFailSound: {fileID: 8300000, guid: dfb00bb4e8471d94e9e79a88ee1d7251, type: 3}
+  knifeHitFailSound: {fileID: 8300000, guid: 0765dc4619cb6bf46bf002a69b68e6b2, type: 3}
+  trunkBreakSound: {fileID: 8300000, guid: 0765dc4619cb6bf46bf002a69b68e6b2, type: 3}
   startLevelSound: {fileID: 8300000, guid: 0765dc4619cb6bf46bf002a69b68e6b2, type: 3}
   level: 1
-  maxLevel: 5
   score: 0
+  knivesPerLevel: 5
+  currentTrunk: {fileID: 0}
 --- !u!1 &417722353
 GameObject:
   m_ObjectHideFlags: 0
@@ -1214,6 +1246,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 597999893}
+  - component: {fileID: 597999894}
   m_Layer: 0
   m_Name: trunkSpawnPoint
   m_TagString: Untagged
@@ -1236,6 +1269,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &597999894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597999892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdfdeef56d86d754eb643d8a00d708bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrunkRotate
+  rotateSpeed: 150
+  hitTarget: 5
+  trunkPieces:
+  - {fileID: 696804340}
 --- !u!1 &641747861
 GameObject:
   m_ObjectHideFlags: 0
@@ -1540,9 +1589,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 367719679}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: QuitToStartPanel
+        m_MethodName: OnRestartButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1940,7 +1989,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 367719679}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: PlayButtonPressed
+        m_MethodName: OnPlayButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2203,17 +2252,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1207075005 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9169161672056326226, guid: d0f71f2f2610af34caef07887b9e1946, type: 3}
-  m_PrefabInstance: {fileID: 327171620}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c768d594517d6a4390723e1d6c13723, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Knife
 --- !u!1 &1713569197
 GameObject:
   m_ObjectHideFlags: 0
@@ -2894,9 +2932,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 367719679}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: RestartLevel
+        m_MethodName: OnRestartButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

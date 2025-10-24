@@ -252,9 +252,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 100006, guid: c4ba4d318a762c64ab4f69d0503da4b1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1680539507741663202}
-    - targetCorrespondingSourceObject: {fileID: 100006, guid: c4ba4d318a762c64ab4f69d0503da4b1, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: -472193975947251771}
     - targetCorrespondingSourceObject: {fileID: 100000, guid: c4ba4d318a762c64ab4f69d0503da4b1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6247821390423488778}
@@ -347,21 +344,6 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 1.55
---- !u!114 &-472193975947251771
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 104521419498349512}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cdfdeef56d86d754eb643d8a00d708bf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TrunkRotate
-  rotateSpeed: 150
-  hitTarget: 5
-  trunkPieces: []
 --- !u!1 &104521419498349514 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100004, guid: c4ba4d318a762c64ab4f69d0503da4b1, type: 3}
